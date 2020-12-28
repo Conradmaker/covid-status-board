@@ -5,46 +5,46 @@ function $(selector: string) {
 function getUnixTimestamp(date: string | Date | number): number {
   return new Date(date).getTime();
 }
-
+console.log(123);
 // DOM
-const confirmedTotal = $(".confirmed-total") as HTMLSpanElement;
-const deathsTotal = $(".deaths") as HTMLParagraphElement;
-const recoveredTotal = $(".recovered") as HTMLParagraphElement;
-const lastUpdatedTime = $(".last-updated-time") as HTMLParagraphElement;
-const rankList = $(".rank-list") as HTMLOListElement;
-const deathsList = $(".deaths-list") as HTMLOListElement;
-const recoveredList = $(".recovered-list") as HTMLOListElement;
-const deathSpinner = createSpinnerElement("deaths-spinner");
-const recoveredSpinner = createSpinnerElement("recovered-spinner");
+const confirmedTotal = $('.confirmed-total') as HTMLSpanElement;
+const deathsTotal = $('.deaths') as HTMLParagraphElement;
+const recoveredTotal = $('.recovered') as HTMLParagraphElement;
+const lastUpdatedTime = $('.last-updated-time') as HTMLParagraphElement;
+const rankList = $('.rank-list') as HTMLOListElement;
+const deathsList = $('.deaths-list') as HTMLOListElement;
+const recoveredList = $('.recovered-list') as HTMLOListElement;
+const deathSpinner = createSpinnerElement('deaths-spinner');
+const recoveredSpinner = createSpinnerElement('recovered-spinner');
 
 function createSpinnerElement(id: string) {
-  const wrapperDiv = document.createElement("div");
-  wrapperDiv.setAttribute("id", id);
+  const wrapperDiv = document.createElement('div');
+  wrapperDiv.setAttribute('id', id);
   wrapperDiv.setAttribute(
-    "class",
-    "spinner-wrapper flex justify-center align-center"
+    'class',
+    'spinner-wrapper flex justify-center align-center'
   );
-  const spinnerDiv = document.createElement("div");
-  spinnerDiv.setAttribute("class", "ripple-spinner");
-  spinnerDiv.appendChild(document.createElement("div"));
-  spinnerDiv.appendChild(document.createElement("div"));
+  const spinnerDiv = document.createElement('div');
+  spinnerDiv.setAttribute('class', 'ripple-spinner');
+  spinnerDiv.appendChild(document.createElement('div'));
+  spinnerDiv.appendChild(document.createElement('div'));
   wrapperDiv.appendChild(spinnerDiv);
   return wrapperDiv;
 }
 
 // state
 let isDeathLoading = false;
-let isRecoveredLoading = false;
+const isRecoveredLoading = false;
 
 // api
 function fetchCovidSummary() {
-  const url = "https://api.covid19api.com/summary";
+  const url = 'https://api.covid19api.com/summary';
   return axios.get(url);
 }
 enum CovidStatus {
-  Confirmed = "confirmed",
-  Recovered = "Recovered",
-  Deaths = "deaths",
+  Confirmed = 'confirmed',
+  Recovered = 'Recovered',
+  Deaths = 'deaths',
 }
 function fetchCountryInfo(countryCode: string, status: CovidStatus) {
   // params: confirmed, recovered, deaths
@@ -60,7 +60,7 @@ function startApp() {
 
 // events
 function initEvents() {
-  rankList.addEventListener("click", handleListClick);
+  rankList.addEventListener('click', handleListClick);
 }
 
 async function handleListClick(event: any) {
@@ -81,15 +81,15 @@ async function handleListClick(event: any) {
   clearRecoveredList();
   startLoadingAnimation();
   isDeathLoading = true;
-  const {data: deathResponse} = await fetchCountryInfo(
+  const { data: deathResponse } = await fetchCountryInfo(
     selectedId,
     CovidStatus.Deaths
   );
-  const {data: recoveredResponse} = await fetchCountryInfo(
+  const { data: recoveredResponse } = await fetchCountryInfo(
     selectedId,
     CovidStatus.Recovered
   );
-  const {data: confirmedResponse} = await fetchCountryInfo(
+  const { data: confirmedResponse } = await fetchCountryInfo(
     selectedId,
     CovidStatus.Confirmed
   );
@@ -107,12 +107,12 @@ function setDeathsList(data: any) {
     (a: any, b: any) => getUnixTimestamp(b.Date) - getUnixTimestamp(a.Date)
   );
   sorted.forEach((value: any) => {
-    const li = document.createElement("li");
-    li.setAttribute("class", "list-item-b flex align-center");
-    const span = document.createElement("span");
+    const li = document.createElement('li');
+    li.setAttribute('class', 'list-item-b flex align-center');
+    const span = document.createElement('span');
     span.textContent = value.Cases;
-    span.setAttribute("class", "deaths");
-    const p = document.createElement("p");
+    span.setAttribute('class', 'deaths');
+    const p = document.createElement('p');
     p.textContent = new Date(value.Date).toLocaleDateString().slice(0, -1);
     li.appendChild(span);
     li.appendChild(p);
@@ -133,12 +133,12 @@ function setRecoveredList(data: any) {
     (a: any, b: any) => getUnixTimestamp(b.Date) - getUnixTimestamp(a.Date)
   );
   sorted.forEach((value: any) => {
-    const li = document.createElement("li");
-    li.setAttribute("class", "list-item-b flex align-center");
-    const span = document.createElement("span");
+    const li = document.createElement('li');
+    li.setAttribute('class', 'list-item-b flex align-center');
+    const span = document.createElement('span');
     span.textContent = value.Cases;
-    span.setAttribute("class", "recovered");
-    const p = document.createElement("p");
+    span.setAttribute('class', 'recovered');
+    const p = document.createElement('p');
     p.textContent = new Date(value.Date).toLocaleDateString().slice(0, -1);
     li.appendChild(span);
     li.appendChild(p);
@@ -165,7 +165,7 @@ function endLoadingAnimation() {
 }
 
 async function setupData() {
-  const {data} = await fetchCovidSummary();
+  const { data } = await fetchCovidSummary();
   setTotalConfirmedNumber(data);
   setTotalDeathsByWorld(data);
   setTotalRecoveredByWorld(data);
@@ -173,18 +173,18 @@ async function setupData() {
   setLastUpdatedTimestamp(data);
 }
 function renderChart(data: any, labels: any) {
-  var ctx = $("#lineChart").getContext("2d");
-  Chart.defaults.global.defaultFontColor = "#f5eaea";
-  Chart.defaults.global.defaultFontFamily = "Exo 2";
+  const ctx = $('#lineChart').getContext('2d');
+  Chart.defaults.global.defaultFontColor = '#f5eaea';
+  Chart.defaults.global.defaultFontFamily = 'Exo 2';
   new Chart(ctx, {
-    type: "line",
+    type: 'line',
     data: {
       labels,
       datasets: [
         {
-          label: "Confirmed for the last two weeks",
-          backgroundColor: "#feb72b",
-          borderColor: "#feb72b",
+          label: 'Confirmed for the last two weeks',
+          backgroundColor: '#feb72b',
+          borderColor: '#feb72b',
           data,
         },
       ],
@@ -229,14 +229,14 @@ function setCountryRanksByConfirmedCases(data: any) {
     (a: any, b: any) => b.TotalConfirmed - a.TotalConfirmed
   );
   sorted.forEach((value: any) => {
-    const li = document.createElement("li");
-    li.setAttribute("class", "list-item flex align-center");
-    li.setAttribute("id", value.Slug);
-    const span = document.createElement("span");
+    const li = document.createElement('li');
+    li.setAttribute('class', 'list-item flex align-center');
+    li.setAttribute('id', value.Slug);
+    const span = document.createElement('span');
     span.textContent = value.TotalConfirmed;
-    span.setAttribute("class", "cases");
-    const p = document.createElement("p");
-    p.setAttribute("class", "country");
+    span.setAttribute('class', 'cases');
+    const p = document.createElement('p');
+    p.setAttribute('class', 'country');
     p.textContent = value.Country;
     li.appendChild(span);
     li.appendChild(p);
