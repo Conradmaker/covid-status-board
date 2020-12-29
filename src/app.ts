@@ -9,14 +9,16 @@ import {
 } from './covid';
 
 // utils
-function $(selector: string) {
-  return document.querySelector(selector);
+//HtmlDivElement를 기본값으로 줘서 div선택자인경우에는 제네릭을 줄 필요가 없다.
+function $<T extends HTMLElement = HTMLDivElement>(selector: string): T {
+  return document.querySelector(selector) as T;
 }
 function getUnixTimestamp(date: string | Date | number): number {
   return new Date(date).getTime();
 }
 console.log(123);
 // DOM
+const temp = $<HTMLParamElement>('asd');
 const confirmedTotal = $('.confirmed-total') as HTMLSpanElement;
 const deathsTotal = $('.deaths') as HTMLParagraphElement;
 const recoveredTotal = $('.recovered') as HTMLParagraphElement;
@@ -52,7 +54,7 @@ function fetchCovidSummary(): Promise<AxiosResponse<CovidSummaryResponse>> {
 }
 
 function fetchCountryInfo(
-  countryName: string,
+  countryName: string | undefined,
   status: CovidStatus
 ): Promise<AxiosResponse<CountrySummaryResponse>> {
   // params: confirmed, recovered, deaths
@@ -68,17 +70,21 @@ function startApp(): void {
 
 // events
 function initEvents() {
+  if (!rankList) return;
   rankList.addEventListener('click', handleListClick);
 }
 
-async function handleListClick(event: MouseEvent) {
+async function handleListClick(event: Event) {
   console.log(event.target);
   let selectedId;
   if (
     event.target instanceof HTMLParagraphElement ||
     event.target instanceof HTMLSpanElement
   ) {
-    selectedId = event.target.parentElement.id;
+    //삼항연산자를 통해 중첩 if를 줄이기 (null타입에러 해결)
+    selectedId = event.target.parentElement
+      ? event.target.parentElement.id
+      : undefined;
   }
   if (event.target instanceof HTMLLIElement) {
     selectedId = event.target.id;
@@ -126,12 +132,18 @@ function setDeathsList(data: CountrySummaryResponse) {
     p.textContent = new Date(value.Date).toLocaleDateString().slice(0, -1);
     li.appendChild(span);
     li.appendChild(p);
+
+    //non-null assertion
+    //deathsList!.appendChild(li);
+
     deathsList.appendChild(li);
   });
 }
 
 function clearDeathList() {
-  deathsList.innerHTML = null;
+  //null걸러주기
+  if (!deathsList) return;
+  deathsList.innerHTML = '';
 }
 
 function setTotalDeathsByCountry(data: CountrySummaryResponse) {
@@ -153,12 +165,14 @@ function setRecoveredList(data: CountrySummaryResponse) {
     p.textContent = new Date(value.Date).toLocaleDateString().slice(0, -1);
     li.appendChild(span);
     li.appendChild(p);
-    recoveredList.appendChild(li);
+    //옵셔널 체이닝 연산자
+    recoveredList?.appendChild(li);
+    //null이거나 undefined appendChild를 하지 않고, null이 아니면 한다.
   });
 }
 
 function clearRecoveredList() {
-  recoveredList.innerHTML = null;
+  recoveredList.innerHTML = '';
 }
 
 function setTotalRecoveredByCountry(data: CountrySummaryResponse) {
